@@ -1,0 +1,4 @@
+1- Active vs passive:
+https://deepai.org/publication/aandp-utilizing-prolog-for-converting-between-active-sentence-and-passive-sentence-with-three-steps-conversion
+
+
