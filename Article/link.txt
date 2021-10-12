@@ -1,4 +1,5 @@
 1- Active vs passive:
 https://deepai.org/publication/aandp-utilizing-prolog-for-converting-between-active-sentence-and-passive-sentence-with-three-steps-conversion
 
-
+2- Lexical simplification
+https://medium.com/@armandj.olivares/how-to-use-bert-for-lexical-simplification-6edbf5a4d15e
