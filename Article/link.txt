@@ -4,4 +4,6 @@ https://deepai.org/publication/aandp-utilizing-prolog-for-converting-between-act
 2- Lexical simplification
 https://medium.com/@armandj.olivares/how-to-use-bert-for-lexical-simplification-6edbf5a4d15e
 
+3- Analyzing Sentence Structure (NLTK)
+https://www.nltk.org/book/ch08.html
 
