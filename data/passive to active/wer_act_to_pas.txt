@@ -1,0 +1,124 @@
+REF: harry ate six shrimp at dinner.
+HYP: harry ate six shrimp at dinner.
+SENTENCE 1
+Correct          = 100.0%    6   (     6)
+Errors           =   0.0%    0   (     6)
+REF: beautiful giraffes roam the savannah.
+HYP: beautiful giraffes roam the savannah.
+SENTENCE 2
+Correct          = 100.0%    5   (     5)
+Errors           =   0.0%    0   (     5)
+REF: sue changed the flat tire.
+HYP: sue changed the flat tire.
+SENTENCE 3
+Correct          = 100.0%    5   (     5)
+Errors           =   0.0%    0   (     5)
+REF: [31m*[0m [31mWE   [0m [31mARE[0m going to [31m**[0m [31mWATCH  [0m [31mA [0m [31mMOVIE[0m tonight.
+HYP: [31mA[0m [31mMOVIE[0m [31mIS [0m going to [31mBE[0m [31mWATCHED[0m [31mBY[0m [31mUS   [0m tonight.
+SENTENCE 4
+Correct          =  37.5%    3   (     8)
+Errors           =  87.5%    7   (     8)
+REF: i ran the obstacle course in record time.
+HYP: i ran the obstacle course in record time.
+SENTENCE 5
+Correct          = 100.0%    8   (     8)
+Errors           =   0.0%    0   (     8)
+REF: the crew paved the entire stretch of highway.
+HYP: the crew paved the entire stretch of highway.
+SENTENCE 6
+Correct          = 100.0%    8   (     8)
+Errors           =   0.0%    0   (     8)
+REF: mom read the novel in one day.
+HYP: mom read the novel in one day.
+SENTENCE 7
+Correct          = 100.0%    7   (     7)
+Errors           =   0.0%    0   (     7)
+REF: i will clean the house every saturday.
+HYP: i will clean the house every saturday.
+SENTENCE 8
+Correct          = 100.0%    7   (     7)
+Errors           =   0.0%    0   (     7)
+REF: the company requires [31m***[0m staff to watch a safety video every year.
+HYP: the company requires [31mTHE[0m staff to watch a safety video every year.
+SENTENCE 9
+Correct          = 100.0%   11   (    11)
+Errors           =   9.1%    1   (    11)
+REF: tom painted the entire house.
+HYP: tom painted the entire house.
+SENTENCE 10
+Correct          = 100.0%    5   (     5)
+Errors           =   0.0%    0   (     5)
+REF: the teacher always answers the students' questions.
+HYP: the teacher always answers the students' questions.
+SENTENCE 11
+Correct          = 100.0%    7   (     7)
+Errors           =   0.0%    0   (     7)
+REF: the choir really enjoys that piece.
+HYP: the choir really enjoys that piece.
+SENTENCE 12
+Correct          = 100.0%    6   (     6)
+Errors           =   0.0%    0   (     6)
+REF: a forest fire destroyed the whole suburb.
+HYP: a forest fire destroyed the whole suburb.
+SENTENCE 13
+Correct          = 100.0%    7   (     7)
+Errors           =   0.0%    0   (     7)
+REF: the two kings are signing the treaty.
+HYP: the two kings are signing the treaty.
+SENTENCE 14
+Correct          = 100.0%    7   (     7)
+Errors           =   0.0%    0   (     7)
+REF: [31m*****[0m [31m******[0m [31mTHE[0m [31mCLEANING[0m [31mCREW[0m [31mVACUUMS [0m and [31mDUSTS [0m [31mTHE[0m [31mOFFICE[0m [31mEVERY   [0m [31mNIGHT.[0m
+HYP: [31mEVERY[0m [31mNIGHT,[0m [31mTHE[0m [31mOFFICE  [0m [31mIS  [0m [31mVACUUMED[0m and [31mDUSTED[0m [31mBY [0m [31mTHE   [0m [31mCLEANING[0m [31mCREW. [0m
+SENTENCE 15
+Correct          =  10.0%    1   (    10)
+Errors           = 110.0%   11   (    10)
+REF: [31m*****[0m [31mLARRY[0m generously donated [31mMONEY[0m to the homeless [31m*******[0m [31m**[0m [31mSHELTER.[0m
+HYP: [31mMONEY[0m [31mWAS  [0m generously donated [31m*****[0m to the homeless [31mSHELTER[0m [31mBY[0m [31mLARRY.  [0m
+SENTENCE 16
+Correct          =  62.5%    5   (     8)
+Errors           =  75.0%    6   (     8)
+REF: the wedding planner is making all the reservations.
+HYP: the wedding planner is making all the reservations.
+SENTENCE 17
+Correct          = 100.0%    8   (     8)
+Errors           =   0.0%    0   (     8)
+REF: susan will bake two dozen cookies for the bake sale.
+HYP: susan will bake two dozen cookies for the bake sale.
+SENTENCE 18
+Correct          = 100.0%   10   (    10)
+Errors           =   0.0%    0   (    10)
+REF: the science class viewed the comet.
+HYP: the science class viewed the comet.
+SENTENCE 19
+Correct          = 100.0%    6   (     6)
+Errors           =   0.0%    0   (     6)
+REF: the director will give [31mYOU[0m instructions.
+HYP: the director will give [31m***[0m instructions.
+SENTENCE 20
+Correct          =  83.3%    5   (     6)
+Errors           =  16.7%    1   (     6)
+REF: thousands of tourists visit the grand canyon every year.
+HYP: thousands of tourists visit the grand canyon every year.
+SENTENCE 21
+Correct          = 100.0%    9   (     9)
+Errors           =   0.0%    0   (     9)
+REF: the homeowners remodeled the house to help it sell.
+HYP: the homeowners remodeled the house to help it sell.
+SENTENCE 22
+Correct          = 100.0%    9   (     9)
+Errors           =   0.0%    0   (     9)
+REF: the saltwater corroded the metal beams.
+HYP: the saltwater corroded the metal beams.
+SENTENCE 23
+Correct          = 100.0%    6   (     6)
+Errors           =   0.0%    0   (     6)
+REF: the kangaroo carried the baby in her pouch.
+HYP: the kangaroo carried the baby in her pouch.
+SENTENCE 24
+Correct          = 100.0%    8   (     8)
+Errors           =   0.0%    0   (     8)
+Sentence count: 24
+WER:    14.689% (        26 /        177)
+WRR:    89.831% (       159 /        177)
+SER:    20.833% (         5 /         24)
