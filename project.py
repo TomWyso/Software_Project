@@ -11,7 +11,27 @@ from readability import Readability
 import pandas as pd
 
 nlp = spacy.load("en_core_web_sm")
-
+def tok():
+    p = inflect.engine()
+    nb = [x.name() for x in wn.all_synsets()]
+    #with open('syn.pkl', 'wb') as f:
+    #    pickle.dump(nb, f)
+    #with open('syn.pkl', 'rb') as f:
+     #   nb= pickle.load(f)
+    mwe = []
+    for x in nb:
+        if '_' in x:
+            mwe.append(tuple(x.split('.')[0].split('_')))
+    mwe.append(tuple(x.split('.')[0].split('_')))
+    tokenizer = MWETokenizer(mwe)
+    return tokenizer,p
+def nouninv(noun):
+    noundict = {'i': 'me', 'we': 'us', 'you': 'you', 'he': 'him', 'she': 'her', 'they': 'them', 'them': 'they',
+                'her': 'she', 'him': 'he', 'us': 'we', 'me': 'i'}
+    n = noun.lower()
+    if n in noundict:
+        return noundict[n]
+    return noun
 def evaluation(text):
     r= Readability(text)
     print(f'flesh_kincaid : {r.flesch_kincaid()}')
@@ -29,13 +49,7 @@ def parentesis(text):
         #return new
     else:
         return text
-def nouninv(noun):
-    noundict = {'i': 'me', 'we': 'us', 'you': 'you', 'he': 'him', 'she': 'her', 'they': 'them', 'them': 'they',
-                'her': 'she', 'him': 'he', 'us': 'we', 'me': 'i'}
-    n = noun.lower()
-    if n in noundict:
-        return noundict[n]
-    return noun
+
 def pass2act(doc, rec=False):
     #nlp = spacy.load("en_core_web_sm")
     parse = nlp(doc)
@@ -440,9 +454,10 @@ def lexical_simp(s,tokenizer, inflect):
 
 def main(sentence):
     sentence=parentesis(sentence)
-    with open('token.pkl', 'rb') as f:
-        t= pickle.load(f)
-    p = inflect.engine()
+    #with open('token.pkl', 'rb') as f:
+    #    t= pickle.load(f)
+    #p = inflect.engine()
+    t,p=tok()
     a = set(re.findall('([a-z1-9])(\.)[^" "]', sentence))
     for elt in a:
         sentence = sentence.replace(elt[0] + elt[1], elt[0] + elt[1] + " ")
@@ -465,12 +480,12 @@ def main(sentence):
     return all
 
 
-#sentence="""the cat that is big"""
-#simp = main(sentence)
-#print(simp)
+sentence="""the cat that is big"""
+simp = main(sentence)
+print(simp)
 
-data = pd.read_csv('parawiki_english05', sep="\t", header=None)
+"""data = pd.read_csv('parawiki_english05', sep="\t", header=None)
 data.columns = ["text", "simplify text", "score"]
 sentences= list(data['text'])[0:10]
 simp_sent=[main(s) for s in sentences]
-print(simp_sent)
+print(simp_sent)"""
