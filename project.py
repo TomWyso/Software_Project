@@ -1,6 +1,5 @@
 import spacy
 import pattern.en as en
-from wordinv import nouninv
 import re
 import nltk
 from nltk.corpus import wordnet as wn
@@ -30,7 +29,13 @@ def parentesis(text):
         #return new
     else:
         return text
-
+def nouninv(noun):
+    noundict = {'i': 'me', 'we': 'us', 'you': 'you', 'he': 'him', 'she': 'her', 'they': 'them', 'them': 'they',
+                'her': 'she', 'him': 'he', 'us': 'we', 'me': 'i'}
+    n = noun.lower()
+    if n in noundict:
+        return noundict[n]
+    return noun
 def pass2act(doc, rec=False):
     #nlp = spacy.load("en_core_web_sm")
     parse = nlp(doc)
