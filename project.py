@@ -35,15 +35,6 @@ def nouninv(noun):
 def parentesis(text):
     modified_string = re.sub(r"(\(.*\))", " ", text)
     return modified_string.strip()
-"""def parentesis(text):
-    if '(' in text:
-        x = re.match(r'^(.+)(\(.+\))(.+)', text)
-        new = x.group(1) +' '+ x.group(3)
-        new = re.sub(' +', ' ', new)
-        return parentesis(new)
-        #return new
-    else:
-        return text"""
 
 def pass2act(doc, rec=False):
     #nlp = spacy.load("en_core_web_sm")
@@ -104,12 +95,14 @@ def pass2act(doc, rec=False):
                     verbtense = en.PRESENT
                     verbaspect = en.PROGRESSIVE
                 elif word.tag_ == 'VBN':
-
                     verbtense = en.PAST
                 elif word.tag_ == 'VBZ' or word.text in["'re","'s"]:
                     verbtense = en.PRESENT
                 else:
-                    verbtense = en.tenses(word.text)[0][0]
+                    try:
+                        verbtense = en.tenses(word.text)[0][0]
+                    except:
+                        verbtense = en.PRESENT
             if word.dep_ == 'prt':
                 if word.head.dep_ == 'ROOT':
                     part = ''.join(w.text_with_ws.lower() if w.tag_ not in ('NNP','NNPS') else w.text_with_ws for w in word.subtree).strip()
@@ -378,45 +371,44 @@ def relative_clause(sentence):
     return (r_clause, sent, place, text)
 # How to get the non-root verb from sentences like "She lives in New York, which she hates.": i.dep_ == "ccomp"
 
-def get_pp(sentence):
+def get_pp(sentence, subtree_length):
     subtrees = []
     root = []
-    for i in nlp(sentence):
-        if i.dep_ == "ROOT":
-            root.append(i.lemma_)
-        # print(i.text, i.dep_)
-        # print(i.text, i.tag_, i.dep_)
+    for i in nlp(sentence): #parse through all the tokens in the parsed sentence
+        if i.dep == "ROOT": #if a word has dependency category "ROOT"
+            root.append(i.lemma) #save lemma (uninflected form)
+        #print(i.text, i.dep)
+        #print(i.text, i.tag, i.dep)
         if "be" not in root:
-            if i.dep_ == "prep" and i.text != "to" and i.text != "of":
-                # print("Subtree:", [(e.text, e.i) for e in i.subtree])
-                subtrees.append([e.i for e in i.subtree])
-            # print(subtrees)
-
-    # flat_list = []
-    # for sublist in subtrees:
-    #    for item in sublist:
-    #        flat_list.append(item)
+            if i.dep_ == "prep" and i.text != "to" and i.text != "of" and i.text != "out": #restrictions on dependency and text
+                #test = [(e.text, e.i) for e in i.subtree]
+                #print(test)
+                #print("Subtree:", len([(e.text, e.i) for e in i.subtree]), [(e.text, e.i) for e in i.subtree], "\n") #print out len of subtree
+                if len([(e.text, e.i) for e in i.subtree]) < subtree_length: #if the len of subtree is bigger than given argument subtree_length
+                    #print("Subtree len >", subtree_length, ":", [(e.text, e.i) for e in i.subtree], "\n")
+                    subtrees.append([e.i for e in i.subtree]) #append to list of subtrees
 
     flat_list = [item for sublist in subtrees for item in sublist]
 
     return flat_list
 
-def remove_pp(sentence):
-    subtree = get_pp(sentence)
+def remove_pp(sentence, subtree_length=5):
+    subtree = get_pp(sentence, subtree_length) #call in get_pp with specified subtree length
+    #print("this is my subtree from pp: ", subtree)
     new_sentence_words = []
-    for i in nlp(sentence):
-        if i.i not in subtree:
-            # print(type(i))
+    for i in nlp(sentence): #future work: optimize by calling nlp only once
+        if i.i not in subtree: #if token not in subtree from get_pp
+            #print(type(i))
             new_sentence_words.append(i)
+            #print(new_sentence_words)
 
-    new_sentence_words = (''.join(token.text_with_ws for token in new_sentence_words))
-    #print(sentence, "--->", new_sentence_words)
+    new_sentence_words = (''.join(token.text_with_ws for token in new_sentence_words)) #concatenate tokens together. pretty ugly still
+    #print(sentence, "--->")
     return (new_sentence_words)
 
 def lexical_simp(s,tokenizer, inflect):
     p=inflect
-    # add a space before every punctuation ". , ; ! : ? etc."
-    s = s.replace('.', ' .')  
+    s = s.replace('.', ' .')  # add a space before every punctuation ". , ; ! : ? etc."
     s = s.replace('!', ' !')
     s = s.replace(':', ' :')
     s = s.replace(';', ' ;')
@@ -440,14 +432,13 @@ def lexical_simp(s,tokenizer, inflect):
         else:
             sentence.append(i)
         index += 1
-    # simplification based on statistic'
+    # simplification'
     t = sentence
     for word in t:  # 'I wear a titfer'
         if nltk.pos_tag([word])[0][1] in Ntag:  # titfers (NNS) True
             if zipf_frequency(word, 'en') < 2.5:  # should be simplified
                 plural = False
                 if nltk.pos_tag([word])[0][1] == 'NNS' and p.singular_noun(word) != False:
-                    # find out if the word to replace is plural or singular
                     plural = True
                     word = p.singular_noun(word)
                 w = wn.synsets(word)
@@ -472,13 +463,11 @@ def lexical_simp(s,tokenizer, inflect):
 
                     choice = sorted(candidate + word_f, reverse=True)
                     b = choice[0][1]
-                    # put word in singular or plurar
                     if plural == True:
                         b = p.plural_noun(choice[0][1])
                         word = p.plural_noun(word)
                     t = [a.replace(word, b) for a in t]
-    
-    # transform "a" <--> "an" doesn't work with word that begin by'h'
+
     index = 0
     vowel = ['a', 'e', 'i', 'o', 'u']
     for i in t:
@@ -489,8 +478,7 @@ def lexical_simp(s,tokenizer, inflect):
             if t[index + 1][0] not in vowel:
                 t[index] = 'a'
         index += 1
-    
-    # modify punctuation presentation 
+
     s = ' '.join(t)
     s = s.replace("_", ' ')
     s = s.replace(' .', '.')
@@ -498,6 +486,9 @@ def lexical_simp(s,tokenizer, inflect):
     s = s.replace(' :', ':')
     s = s.replace(' ;', ';')
     s = s.replace(' ,', ',')
+    s = s.replace(' - ','-')
+    s = s.replace('- ','-')
+    s = s.replace('- ', '-')
 
     return s  # 'I wear a hat'
 
@@ -513,13 +504,27 @@ def main(sentence):
         sentence = sentence.replace(elt[0] + elt[1], elt[0] + elt[1] + " ")
     all = ''
     for s in sent_tokenize(sentence):
-        #s = lexical_simp(s,t,p)
-        #s= relative_clause(s)[3]
-        #s=remove_pp(s)
-        #s=pass2act(s)
-        s = lexical_simp(relative_clause(pass2act(s))[3], t, p)
+        try:
+            s=pass2act(s)
+        except:
+            s
+        try:
+            relative_clause(s)[3]
+        except:
+            s
+        try:
+            s=remove_pp(s)
+        except:
+            s
+        try:
+            lexical_simp(s)
+        except:
+            s
+            
         #s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
         all += s[0].upper() + s[1:]
+
+
         if s[-1] in ('.', '!', '?'):
             all += " "
         elif s[-1] == ' ':
@@ -529,7 +534,3 @@ def main(sentence):
 
     return all
 
-#sentence=""", which means `` live free or die . ''"""
-#simp = main(sentence)
-#print(simp)
-#help(inflect)
