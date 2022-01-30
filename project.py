@@ -4,27 +4,26 @@ import re
 import nltk
 from nltk.corpus import wordnet as wn
 from wordfreq import zipf_frequency
-from nltk.tokenize import MWETokenizer, sent_tokenize
+from nltk.tokenize import MWETokenizer, sent_tokenize,word_tokenize
 import inflect
 import pickle
 from readability import Readability
-import pandas as pd
+
 
 nlp = spacy.load("en_core_web_sm")
 def tok():
-    p = inflect.engine()
+    #this function only use once, create the tokenizer and save it in pickle file
     nb = [x.name() for x in wn.all_synsets()]
-    #with open('syn.pkl', 'wb') as f:
-    #    pickle.dump(nb, f)
-    #with open('syn.pkl', 'rb') as f:
-     #   nb= pickle.load(f)
     mwe = []
     for x in nb:
         if '_' in x:
             mwe.append(tuple(x.split('.')[0].split('_')))
     mwe.append(tuple(x.split('.')[0].split('_')))
     tokenizer = MWETokenizer(mwe)
-    return tokenizer,p
+    with open('tok.pkl', 'wb') as f:
+        pickle.dump(tokenizer, f)
+    return tokenizer
+
 def nouninv(noun):
     noundict = {'i': 'me', 'we': 'us', 'you': 'you', 'he': 'him', 'she': 'her', 'they': 'them', 'them': 'they',
                 'her': 'she', 'him': 'he', 'us': 'we', 'me': 'i'}
@@ -32,15 +31,11 @@ def nouninv(noun):
     if n in noundict:
         return noundict[n]
     return noun
-def evaluation(text):
-    r= Readability(text)
-    print(f'flesh_kincaid : {r.flesch_kincaid()}')
-    print(f'flasch :  {r.flesch()}')
-    print(f'Gunning fog :  {r.gunning_fog()}')
-    print(f'Dale-Chall :  {r.dale_chall()}')
-    print(f'linsear write :   {r.linsear_write()}')
 
 def parentesis(text):
+    modified_string = re.sub(r"(\(.*\))", " ", text)
+    return modified_string.strip()
+"""def parentesis(text):
     if '(' in text:
         x = re.match(r'^(.+)(\(.+\))(.+)', text)
         new = x.group(1) +' '+ x.group(3)
@@ -48,7 +43,7 @@ def parentesis(text):
         return parentesis(new)
         #return new
     else:
-        return text
+        return text"""
 
 def pass2act(doc, rec=False):
     #nlp = spacy.load("en_core_web_sm")
@@ -111,8 +106,9 @@ def pass2act(doc, rec=False):
                 elif word.tag_ == 'VBN':
 
                     verbtense = en.PAST
+                elif word.tag_ == 'VBZ' or word.text in["'re","'s"]:
+                    verbtense = en.PRESENT
                 else:
-
                     verbtense = en.tenses(word.text)[0][0]
             if word.dep_ == 'prt':
                 if word.head.dep_ == 'ROOT':
@@ -147,7 +143,6 @@ def pass2act(doc, rec=False):
 
         # if no agent is found:
         if agent == '':
-            # what am I gonna do? BITconEEEEEEECT!!!!
             newdoc += str(sent) + ' '
             continue
 
@@ -155,9 +150,8 @@ def pass2act(doc, rec=False):
         agent = nouninv(agent)
         subjpass = nouninv(subjpass)
 
-        # FUCKING CONJUGATION!!!!!!!!!!!!!:
+
         auxstr = ''
-        #num = en.SINGULAR if not aplural or agent in ('he','she') else en.PLURAL
         aux.append(aux[0])
         verbaspect = None
         if "and" in agent:
@@ -194,7 +188,10 @@ def pass2act(doc, rec=False):
                 elif a.tag_ == 'VBZ' or a.tag_ == 'VBP':
                     verbtense=en.PRESENT
             elif a.lemma_ == 'have':
-                num == en.PLURAL if p.tag_ == 'MD' else num
+                if p.tag_ == 'MD':
+                    num == en.PLURAL
+                else:
+                    num
                 if a.tag_ == ('VBP' or 'VBG' or 'VBZ'):
                     auxtense=en.PRESENT
                 else:
@@ -254,14 +251,18 @@ def relative_clause(sentence):
                     place = h.head.i
                     idx = sent.index(h.head)
                     for elt in h.subtree:
-                        sent.remove(elt)
+                        if elt in sent:
+                            sent.remove(elt)
                         if elt.i < h.i:
                             if elt != token and elt.tag_ != 'PRP':
                                 r_clause.append(elt)
                         else:
                             r_clause.append(elt)
                     r_clause.append(nlp('to')[0])
-                    sent[idx] = nlp(h.head.lemma_)[0]
+                    if len(sent)==0:
+                        place=0
+                    else:
+                        sent[idx] = nlp(h.head.lemma_)[0]
                     rel=True
 
 
@@ -301,7 +302,8 @@ def relative_clause(sentence):
                         subj = [elt for elt in h.head.subtree if elt not in sub]
                         subj[0] = nlp(subj[0].text.capitalize())[0]
                         for i, elt in enumerate(sub):
-                            sent.remove(elt)
+                            if elt in sent:
+                                sent.remove(elt)
                             if i != 0:
                                 r_clause.append(elt)
                         r_clause = subj + r_clause
@@ -318,12 +320,12 @@ def relative_clause(sentence):
                         return (r_clause, sent, place, text)
 
             elif token.dep_ in list_rel:
+                marker=False
                 #print('ADVCL')
                 h = token.head
-                r=''
                 if doc[h.head.i].lemma_ == 'be':
-                    #print('oui')
-                    sent.insert(h.head.i - 1, nlp('that')[0])
+                    if sent[h.head.i-2].text !='that':
+                        sent.insert(h.head.i - 1, nlp('that')[0])
                     rel_rec = ''
                     for i, elt in enumerate(token.subtree):
                         sent.remove(elt)
@@ -331,15 +333,21 @@ def relative_clause(sentence):
                             rel_rec += elt.text.capitalize() + ' '
                         else:
                             rel_rec += elt.text + ' '
+
                     for i, elt in enumerate(sent):
+                        if elt.text=='that':
+                            marker=True
                         if i == 0:
                             rel_rec += elt.text.lower() + ' '
                         else:
                             rel_rec += elt.text + ' '
-                    if r!= rel_rec:
-                        #print(rel_rec)
+                    rel_rec = re.sub(r' +',' ', rel_rec)
+
+                    if rel_rec==sentence or marker:
+                        return r_clause, sent, place, rel_rec
+                    else:
                         r_clause, sent, place, t = relative_clause(rel_rec)
-                        r=rel_rec
+
                 else:
                     continue
 
@@ -406,19 +414,38 @@ def remove_pp(sentence):
     return (new_sentence_words)
 
 def lexical_simp(s,tokenizer, inflect):
-    p= inflect
-    nouns = ['NN', 'NNS', 'JJ']
-    #print('INITIAL SENTENCE:\n', s)
-    s = s.replace('.', ' .')  # add a space after every punctuation ". , ; ! : ? etc."
+    p=inflect
+    s = s.replace('.', ' .')  # add a space before every punctuation ". , ; ! : ? etc."
+    s = s.replace('!', ' !')
+    s = s.replace(':', ' :')
+    s = s.replace(';', ' ;')
+    s = s.replace(',', ' ,')
     t = tokenizer.tokenize(s.split())
+    Ntag = ['NN', 'NNS']
+    adjtag = ['JJ', 'JJR', 'JJS']
+    # search for comma and adj before multiword and take simple word
+    index = 0
+    sentence = []
+    for i in t:
+        if i == ',':
+            token = nlp(t[index - 1])
+            sentence.append(i)
+            if token[0].tag_ in adjtag:
+                token = t[index + 1].replace('_', ' ')
+                token = word_tokenize(token)
+                for j in token:
+                    sentence.append(j)
+                t.pop(index)
+        else:
+            sentence.append(i)
+        index += 1
+    # simplification'
+    t = sentence
     for word in t:  # 'I wear a titfer'
-
-        if nltk.pos_tag([word])[0][1] in nouns:  # titfers (NNS) True
-            # print(word)
+        if nltk.pos_tag([word])[0][1] in Ntag:  # titfers (NNS) True
             if zipf_frequency(word, 'en') < 2.5:  # should be simplified
                 plural = False
-
-                if nltk.pos_tag([word])[0][1] == 'NNS' or p.singular_noun(word) != False:
+                if nltk.pos_tag([word])[0][1] == 'NNS' and p.singular_noun(word) != False:
                     plural = True
                     word = p.singular_noun(word)
                 w = wn.synsets(word)
@@ -443,21 +470,39 @@ def lexical_simp(s,tokenizer, inflect):
 
                     choice = sorted(candidate + word_f, reverse=True)
                     b = choice[0][1]
-                    if plural:
+                    if plural == True:
                         b = p.plural_noun(choice[0][1])
                         word = p.plural_noun(word)
                     t = [a.replace(word, b) for a in t]
-    s = ' '.join(t)
-    s = s.replace(' .', '.')
 
-    return s
+    index = 0
+    vowel = ['a', 'e', 'i', 'o', 'u']
+    for i in t:
+        if i == 'a':
+            if t[index + 1][0] in vowel:
+                t[index] = 'an'
+        elif i == 'an':
+            if t[index + 1][0] not in vowel:
+                t[index] = 'a'
+        index += 1
+
+    s = ' '.join(t)
+    s = s.replace("_", ' ')
+    s = s.replace(' .', '.')
+    s = s.replace(' !', '!')
+    s = s.replace(' :', ':')
+    s = s.replace(' ;', ';')
+    s = s.replace(' ,', ',')
+
+    return s  # 'I wear a hat'
 
 def main(sentence):
+    print(type(sentence),sentence)
     sentence=parentesis(sentence)
-    #with open('token.pkl', 'rb') as f:
-    #    t= pickle.load(f)
-    #p = inflect.engine()
-    t,p=tok()
+    #t=tok()
+    with open('token.pkl', 'rb') as f:
+        t= pickle.load(f)
+    p = inflect.engine()
     a = set(re.findall('([a-z1-9])(\.)[^" "]', sentence))
     for elt in a:
         sentence = sentence.replace(elt[0] + elt[1], elt[0] + elt[1] + " ")
@@ -467,8 +512,8 @@ def main(sentence):
         #s= relative_clause(s)[3]
         #s=remove_pp(s)
         #s=pass2act(s)
-
-        s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
+        s = lexical_simp(relative_clause(pass2act(s))[3], t, p)
+        #s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
         all += s[0].upper() + s[1:]
         if s[-1] in ('.', '!', '?'):
             all += " "
@@ -479,13 +524,7 @@ def main(sentence):
 
     return all
 
-
-sentence="""the cat that is big"""
-simp = main(sentence)
-print(simp)
-
-"""data = pd.read_csv('parawiki_english05', sep="\t", header=None)
-data.columns = ["text", "simplify text", "score"]
-sentences= list(data['text'])[0:10]
-simp_sent=[main(s) for s in sentences]
-print(simp_sent)"""
+#sentence=""", which means `` live free or die . ''"""
+#simp = main(sentence)
+#print(simp)
+#help(inflect)
