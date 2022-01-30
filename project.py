@@ -415,7 +415,8 @@ def remove_pp(sentence):
 
 def lexical_simp(s,tokenizer, inflect):
     p=inflect
-    s = s.replace('.', ' .')  # add a space before every punctuation ". , ; ! : ? etc."
+    # add a space before every punctuation ". , ; ! : ? etc."
+    s = s.replace('.', ' .')  
     s = s.replace('!', ' !')
     s = s.replace(':', ' :')
     s = s.replace(';', ' ;')
@@ -439,13 +440,14 @@ def lexical_simp(s,tokenizer, inflect):
         else:
             sentence.append(i)
         index += 1
-    # simplification'
+    # simplification based on statistic'
     t = sentence
     for word in t:  # 'I wear a titfer'
         if nltk.pos_tag([word])[0][1] in Ntag:  # titfers (NNS) True
             if zipf_frequency(word, 'en') < 2.5:  # should be simplified
                 plural = False
                 if nltk.pos_tag([word])[0][1] == 'NNS' and p.singular_noun(word) != False:
+                    # find out if the word to replace is plural or singular
                     plural = True
                     word = p.singular_noun(word)
                 w = wn.synsets(word)
@@ -470,11 +472,13 @@ def lexical_simp(s,tokenizer, inflect):
 
                     choice = sorted(candidate + word_f, reverse=True)
                     b = choice[0][1]
+                    # put word in singular or plurar
                     if plural == True:
                         b = p.plural_noun(choice[0][1])
                         word = p.plural_noun(word)
                     t = [a.replace(word, b) for a in t]
-
+    
+    # transform "a" <--> "an" doesn't work with word that begin by'h'
     index = 0
     vowel = ['a', 'e', 'i', 'o', 'u']
     for i in t:
@@ -485,7 +489,8 @@ def lexical_simp(s,tokenizer, inflect):
             if t[index + 1][0] not in vowel:
                 t[index] = 'a'
         index += 1
-
+    
+    # modify punctuation presentation 
     s = ' '.join(t)
     s = s.replace("_", ' ')
     s = s.replace(' .', '.')
