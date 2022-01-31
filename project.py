@@ -10,6 +10,7 @@ import pickle
 from readability import Readability
 
 
+
 nlp = spacy.load("en_core_web_sm")
 def tok():
     #this function only use once, create the tokenizer and save it in pickle file
@@ -203,8 +204,11 @@ def pass2act(doc, rec=False):
         advcl = ''
         if advcltree:
             for w in advcltree:
-                if w.pos_ == 'VERB' and en.tenses(w.text)[0][4] == en.PROGRESSIVE:
-                    advcl += 'which ' + en.conjugate(w.text,tense=en.tenses(verb)[0][0]) + ' '
+                if w.pos_ == 'VERB' and len(en.tenses(w.text)) != 0:
+                    if en.tenses(w.text)[0][4] == en.PROGRESSIVE:
+                        advcl += 'which ' + en.conjugate(w.text, tense=en.tenses(verb)[0][0]) + ' '
+                    else:
+                        advcl += w.text_with_ws
                 else:
                     advcl += w.text_with_ws
 
@@ -496,7 +500,7 @@ def main(sentence):
     print(type(sentence),sentence)
     sentence=parentesis(sentence)
     #t=tok()
-    with open('token.pkl', 'rb') as f:
+    with open('tok.pkl', 'rb') as f:
         t= pickle.load(f)
     p = inflect.engine()
     a = set(re.findall('([a-z1-9])(\.)[^" "]', sentence))
@@ -504,24 +508,14 @@ def main(sentence):
         sentence = sentence.replace(elt[0] + elt[1], elt[0] + elt[1] + " ")
     all = ''
     for s in sent_tokenize(sentence):
-        try:
-            s=pass2act(s)
-        except:
-            s
-        try:
-            relative_clause(s)[3]
-        except:
-            s
-        try:
-            s=remove_pp(s)
-        except:
-            s
-        try:
-            lexical_simp(s)
-        except:
-            s
-            
-        #s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
+
+        #s = lexical_simp(s,t,p)
+        #s= relative_clause(s)[3]
+        #s=remove_pp(s)
+        #s=pass2act(s)
+        #s = lexical_simp(relative_clause(pass2act(s))[3], t, p)
+
+        s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
         all += s[0].upper() + s[1:]
 
 
@@ -533,4 +527,3 @@ def main(sentence):
             all += '. '
 
     return all
-
