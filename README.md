@@ -6,7 +6,7 @@ The main goal of this project is to create a tool of text simplification, notabl
 
 ### project.py
 This file contain all the simplification modules for the the project. In order to use this file a python 3.6 environment is needed. The file tok.pkl is also needed it contain the tokenizer use for the lexical simplification.
-The file main.py allow you to run project.py via our interface: use the command line:   python main.py
+The folder App contains all the material to run the interface and the simplification system. use the command line:   python main.py
 
 
 **Here you will find different folders with their content:**
