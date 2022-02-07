@@ -10,10 +10,9 @@ import pickle
 from readability import Readability
 
 
-
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm") # load the spacy parser for english
 def tok():
-    #this function only use once, create the tokenizer and save it in pickle file
+    """this function only use once, create the tokenizer and save it in pickle file tok.pkl"""
     nb = [x.name() for x in wn.all_synsets()]
     mwe = []
     for x in nb:
@@ -25,7 +24,12 @@ def tok():
         pickle.dump(tokenizer, f)
     return tokenizer
 
+
 def nouninv(noun):
+    """ map subject pronoun with the corresponding object pronoun
+    input: a pronoun object/subject
+    output: coresponding  pronoun subject/object
+    """
     noundict = {'i': 'me', 'we': 'us', 'you': 'you', 'he': 'him', 'she': 'her', 'they': 'them', 'them': 'they',
                 'her': 'she', 'him': 'he', 'us': 'we', 'me': 'i'}
     n = noun.lower()
@@ -33,11 +37,20 @@ def nouninv(noun):
         return noundict[n]
     return noun
 
+
 def parentesis(text):
+    """ remove every element between parentesis
+    input: a text
+    ouput: text without any parentesis
+    """
     modified_string = re.sub(r"(\(.*\))", " ", text)
     return modified_string.strip()
 
+
 def pass2act(doc, rec=False):
+    """ detect passive voice a change sentence from passive to active
+    input: sentence 
+    output: active voice sentence"""
     #nlp = spacy.load("en_core_web_sm")
     parse = nlp(doc)
     newdoc = ''
@@ -219,7 +232,11 @@ def pass2act(doc, rec=False):
 
     return newdoc
 
+
 def relative_clause(sentence):
+    """ detect and linearize relative clause
+    input: sentence
+    output: sentence without relative clause"""
      #nlp = spacy.load("en_core_web_sm")
     doc = nlp(sentence)
     rel = False
@@ -366,16 +383,17 @@ def relative_clause(sentence):
         text += elt.text
         if i != len(final_sent) - 1 and final_sent[i + 1].pos_ != 'PUNCT':
             text += " "
-    #for token in nlp(text):
-     #   if(token.tag_ == 'WDT' or token.tag_ == 'WP') or (token.dep_ in list_rel):
-      #      rec=True
-       #     break
+
     if rec:
         r_clause,sent,place,text=relative_clause(text)
     return (r_clause, sent, place, text)
-# How to get the non-root verb from sentences like "She lives in New York, which she hates.": i.dep_ == "ccomp"
+
 
 def get_pp(sentence, subtree_length):
+    """ detect prepositional phrase
+    input: sentence
+    output: propositional phrase
+    """
     subtrees = []
     root = []
     for i in nlp(sentence): #parse through all the tokens in the parsed sentence
@@ -396,7 +414,12 @@ def get_pp(sentence, subtree_length):
 
     return flat_list
 
+
 def remove_pp(sentence, subtree_length=5):
+    """ remove prepositional phrases of length lower than subtree_length
+    input: sentence, maximum size of prepositional phrase
+    output: sentence without prepositional phrase
+    """
     subtree = get_pp(sentence, subtree_length) #call in get_pp with specified subtree length
     #print("this is my subtree from pp: ", subtree)
     new_sentence_words = []
@@ -410,7 +433,12 @@ def remove_pp(sentence, subtree_length=5):
     #print(sentence, "--->")
     return (new_sentence_words)
 
+
 def lexical_simp(s,tokenizer, inflect):
+    """ simplify vocubulary of sentence using word frequency
+    input: sentence
+    output: sentence with simplify lexicon
+    """
     p=inflect
     s = s.replace('.', ' .')  # add a space before every punctuation ". , ; ! : ? etc."
     s = s.replace('!', ' !')
@@ -496,7 +524,13 @@ def lexical_simp(s,tokenizer, inflect):
 
     return s  # 'I wear a hat'
 
+
 def main(sentence):
+    """ apply simplification on a text  following this hierachy: remove parentesis - get active voice - linearize relative clause - 
+    remove prepositional phrase - simplify lexicon
+    input : text
+    output: simplify text
+    """
     print(type(sentence),sentence)
     sentence=parentesis(sentence)
     #t=tok()
@@ -508,16 +542,8 @@ def main(sentence):
         sentence = sentence.replace(elt[0] + elt[1], elt[0] + elt[1] + " ")
     all = ''
     for s in sent_tokenize(sentence):
-
-        #s = lexical_simp(s,t,p)
-        #s= relative_clause(s)[3]
-        #s=remove_pp(s)
-        #s=pass2act(s)
-        #s = lexical_simp(relative_clause(pass2act(s))[3], t, p)
-
         s = lexical_simp(remove_pp(relative_clause(pass2act(s))[3]),t,p)
         all += s[0].upper() + s[1:]
-
 
         if s[-1] in ('.', '!', '?'):
             all += " "
