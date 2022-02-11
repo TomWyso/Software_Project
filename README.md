@@ -44,7 +44,7 @@ Function used for the passive to active conversion :map subject pronoun with the
 All the programm concerning the relative clause in the simplification process
 
 #### pass2act_modify.py
-The function to pass from passive voice to active
+The function to pass from passive voice to active (modify version of the code done by https://github.com/DanManN/pass2act)
 
 #### lexical_simplification.ipynb
 This file is the lexical simplification (the same as used in the project.py file)
