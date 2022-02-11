@@ -36,7 +36,7 @@ For the passive to active conversion , we use the code done by https://github.co
 This file contain all the simplification modules for the the project. In order to use this file a python 3.6 environment is needed. The file tok.pkl is also needed it contain the tokenizer use for the lexical simplification.
 
 #### wordinv.py
-Function used for the relative clauses function
+Function used for the passive to active conversion :map subject pronoun with the corresponding object pronoun
 
 #### relative_clause.ipynb
 All the programm concerning the relative clause in the simplification process
