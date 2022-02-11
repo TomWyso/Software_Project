@@ -9,8 +9,8 @@ The main goal of this project is to create a tool of text simplification, notabl
 ### App
 
 The folder App contains all the material to run the interface and the simplification system. 
-To run the app and environement python 3.6 in necessary
-use the command line:   python main.py
+<br>To run the app and environement python 3.6 in necessary
+<br>use the command line:   python main.py
 
 ### Article
 
