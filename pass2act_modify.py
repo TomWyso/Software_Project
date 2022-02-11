@@ -99,7 +99,6 @@ def pass2act(doc, rec=False):
 
         # if no agent is found:
         if agent == '':
-            # what am I gonna do? BITconEEEEEEECT!!!!
             newdoc += str(sent) + ' '
             continue
 
@@ -107,7 +106,7 @@ def pass2act(doc, rec=False):
         agent = nouninv(agent)
         subjpass = nouninv(subjpass)
 
-        # FUCKING CONJUGATION!!!!!!!!!!!!!:
+
         auxstr = ''
         #num = en.SINGULAR if not aplural or agent in ('he','she') else en.PLURAL
         aux.append(aux[0])
