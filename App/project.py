@@ -533,7 +533,7 @@ def main(sentence):
     """
     print(type(sentence),sentence)
     sentence=parentesis(sentence)
-    #t=tok()
+    #t=tok()  #uncomment this line if you have not the tok.plk file
     with open('tok.pkl', 'rb') as f:
         t= pickle.load(f)
     p = inflect.engine()
